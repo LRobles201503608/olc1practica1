@@ -201,9 +201,25 @@ public class AnalisisLexico {
                 case 2:
                     if(caracter==94||caracter==118||caracter==60||caracter==62){
                         posicion=String.valueOf(caracteractual);
-                    }else if (caracteractual=='\n'){
+                        estado=3;
+                    }else if(caracter==32){
+                        estado=2;
+                    }
+                    break;
+                case 3:
+                    if (caracteractual=='\n'){
                         figuras.add(new Figuras(simbolo,posicion));
-                        estado=0;
+                        estado=4;
+                    }else{
+                        estado=90;
+                    }
+                    break;
+                case 4:
+                    if(caracter==73||caracter==74||caracter==76||caracter==79||caracter==83||caracter==84||caracter==90){
+                        simbolo=String.valueOf(caracteractual);
+                        estado=1;
+                    }else{
+                        estado=90;
                     }
                     break;
             }
