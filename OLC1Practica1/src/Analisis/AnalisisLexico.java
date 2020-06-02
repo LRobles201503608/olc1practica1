@@ -15,10 +15,11 @@ public class AnalisisLexico {
     String cadena;
     ArrayList<Nivel> niveles=new ArrayList<Nivel>();
     ArrayList<Character> tablero =new ArrayList<Character>();
+    ArrayList<Figuras> figuras=new ArrayList<Figuras>();
     public AnalisisLexico(String cadena) {
         this.cadena = cadena;
     }
-    public void Analisis(String cadena){
+    public void AnalisisTableroNiveles(String cadena){
         int linea = 1;
         int columna = 1;
         String cadconcat="";
@@ -72,13 +73,16 @@ public class AnalisisLexico {
                     break;
 //**********************************case 2estado de nivel y traslado a dimensiones del tablero*********************************************
                 case 2:
+                    if(caracter==32){
+                        estado = 2;
+                    }
                     if(cadconcat.equals("")){
                         if(caracter>=47 && caracter <=58){
                             cadconcat += String.valueOf(caracteractual);
                             estado=2;
                         }
                     }else{
-                        if(cadconcat.charAt(i+1)=='\n'){
+                        if(cadena.charAt(i+1)=='\n'){
                             cadconcat += String.valueOf(caracteractual);
                             estado=2;
                             if(cadconcat.equalsIgnoreCase("10")){
@@ -88,7 +92,7 @@ public class AnalisisLexico {
                                 cadconcat="";
                                 System.out.println("ERROR NUMERO DE NIVEL NO PERMITIDO");
                             }
-                        }else if(cadconcat.charAt(i+1)=='x'){
+                        }else if(cadena.charAt(i+1)=='x'){
                             if(caracter>=47 && caracter <=58){
                                 cadconcat += String.valueOf(caracteractual);
                                 N=Integer.parseInt(cadconcat);
@@ -102,12 +106,17 @@ public class AnalisisLexico {
                 case 3:
                     if(caracter==120||caracter==88){
                         estado=4;
-                    } else{
+                    }else if(caracter==32){
+                        estado = 3;
+                    }else{
                         estado=90;
                     }
                     break;
 //******************************case 4 determinacion de la dimension P*************************************
                 case 4:
+                    if(caracter==32){
+                        estado = 2;
+                    }
                     if(caracter>=47 && caracter <=58){
                             cadconcat += String.valueOf(caracteractual);
                             estado=4;
@@ -158,5 +167,46 @@ public class AnalisisLexico {
             }
         }
         
+    }
+    public void AnalisisFiguras(String cadena){
+        int linea = 1;
+        int columna = 1;
+        String cadconcat="";
+        int estado=0;
+        int caracter =0;
+        char caracteractual;
+        String simbolo="";
+        String posicion="";
+        for(int i=0;i<cadena.length();i++){
+            caracteractual=cadena.charAt(i);
+            caracter=(int)caracteractual;
+            switch(estado){
+                case 0:
+                    if(caracter==73||caracter==74||caracter==76||caracter==79||caracter==83||caracter==84||caracter==90){
+                        simbolo=String.valueOf(caracteractual);
+                        estado=1;
+                    }else{
+                        estado=90;
+                    }
+                    break;
+                case 1:
+                    if(caracter==32){
+                        estado=1;
+                    }else if(caracter==44){
+                        estado=2;
+                    }else{
+                        estado=90;
+                    }
+                    break;
+                case 2:
+                    if(caracter==94||caracter==118||caracter==60||caracter==62){
+                        posicion=String.valueOf(caracteractual);
+                    }else if (caracteractual=='\n'){
+                        figuras.add(new Figuras(simbolo,posicion));
+                        estado=0;
+                    }
+                    break;
+            }
+        }
     }
 }
