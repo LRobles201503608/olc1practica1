@@ -14,10 +14,11 @@ import java.util.ArrayList;
 public class AnalisisLexico {
     String cadena;
     ArrayList<Nivel> niveles=new ArrayList<Nivel>();
-    ArrayList<Character> tablero =new ArrayList<Character>();
+    ArrayList<Character> tablero;
     ArrayList<Figuras> figuras=new ArrayList<Figuras>();
-    public AnalisisLexico(String cadena) {
-        this.cadena = cadena;
+    public AnalisisLexico(ArrayList<Nivel>niveles, ArrayList<Figuras>figuras) {
+        this.niveles=niveles;
+        this.figuras=figuras;
     }
     public void AnalisisTableroNiveles(String cadena){
         int linea = 1;
@@ -30,6 +31,7 @@ public class AnalisisLexico {
         int N=0;
         int P=0;
         String id="";
+        ArrayList<Character> tableroaux =new ArrayList<Character>();
         int contadorsalto=0, contadormayor=0, contadorexclamacion=0;
         for (int i = 0; i<cadena.length() ; i++){
             caracteractual=cadena.charAt(i);
@@ -42,7 +44,8 @@ public class AnalisisLexico {
                         cadconcat += String.valueOf(caracteractual);
                         estado=2;
                     }else{
-                        estado=90;
+                        System.out.println("Existe un error en los caracteres, case 0 archivo 1");
+                        //estado=90;
                     }
                     break;
 //************************************case 1 estado de eliminacion de comentarios*********************************************************
@@ -73,7 +76,10 @@ public class AnalisisLexico {
                     break;
 //**********************************case 2estado de nivel y traslado a dimensiones del tablero*********************************************
                 case 2:
-                    if(caracter==32){
+                    tablero =new ArrayList<Character>();
+                    tablero.clear();
+                    tableroaux.clear();
+                    if(caracter==32||caracter==10||caracter==13){
                         estado = 2;
                     }
                     if(cadconcat.equals("")){
@@ -83,9 +89,11 @@ public class AnalisisLexico {
                         }
                     }else{
                         if(cadena.charAt(i+1)=='\n'){
-                            cadconcat += String.valueOf(caracteractual);
-                            estado=2;
-                            if(cadconcat.equalsIgnoreCase("10")){
+                            if(cadena.charAt(i)!='\r'){
+                                cadconcat += String.valueOf(caracteractual);
+                                estado=2;   
+                            }
+                            if(Integer.parseInt(cadconcat)<=10&&Integer.parseInt(cadconcat)>=3){
                                 nivel=Integer.parseInt(cadconcat);
                                 cadconcat="";
                             } else {
@@ -109,7 +117,8 @@ public class AnalisisLexico {
                     }else if(caracter==32){
                         estado = 3;
                     }else{
-                        estado=90;
+                        System.out.println("Existe un error en los caracteres, case 3 archivo 1");
+                        //estado=90;
                     }
                     break;
 //******************************case 4 determinacion de la dimension P*************************************
@@ -125,7 +134,8 @@ public class AnalisisLexico {
                         estado=5;
                         cadconcat="";
                     } else {
-                        estado=90;
+                        System.out.println("Existe un error en los caracteres, case 4 archivo 1");
+                        //estado=90;
                     }
                     break;
                 case 5:
@@ -151,22 +161,32 @@ public class AnalisisLexico {
                 case 6:
                     if(caracter==42||caracter==35){
                         tablero.add(caracteractual);
-                        estado=7;
+                        estado=6;
                     }else if(caracteractual=='\n'){
-                        estado=7;
+                        estado=6;
                     }else if(caracter>=47 && caracter <=58){
-                        niveles.add(new Nivel(nivel,N,P,id,tablero));
+                        tableroaux=tablero;
+                        niveles.add(new Nivel(nivel,N,P,id,tableroaux));
                         id="";
                         N=0;
                         P=0;
-                        tablero.clear();
                         cadconcat+=caracteractual;
                         estado=2;
+                        System.out.println("Se ingreso el nivel correctamente");
+                    }else if(caracter==32||caracter==10||caracter==13){
+                        
+                    }else{
+                        System.out.println("Existe un error en los caracteres, case 6 archivo 1");
                     }
                     break;
             }
         }
-        
+        tableroaux=tablero;
+        niveles.add(new Nivel(nivel,N,P,id,tableroaux));
+        id="";
+        N=0;
+        P=0;
+        System.out.println("Se ingreso el nivel correctamente");
     }
     public void AnalisisFiguras(String cadena){
         int linea = 1;
@@ -186,7 +206,8 @@ public class AnalisisLexico {
                         simbolo=String.valueOf(caracteractual);
                         estado=1;
                     }else{
-                        estado=90;
+                        System.out.println("Existe un error en los caracteres, case 0 archivo 2");
+                        //estado=90;
                     }
                     break;
                 case 1:
@@ -195,7 +216,8 @@ public class AnalisisLexico {
                     }else if(caracter==44){
                         estado=2;
                     }else{
-                        estado=90;
+                        System.out.println("Existe un error en los caracteres, case 1 archivo 2");
+                        //estado=90;
                     }
                     break;
                 case 2:
@@ -211,7 +233,8 @@ public class AnalisisLexico {
                         figuras.add(new Figuras(simbolo,posicion));
                         estado=4;
                     }else{
-                        estado=90;
+                        System.out.println("Existe un error en los caracteres, case 3 archivo 2");
+                        //estado=90;
                     }
                     break;
                 case 4:
@@ -219,7 +242,8 @@ public class AnalisisLexico {
                         simbolo=String.valueOf(caracteractual);
                         estado=1;
                     }else{
-                        estado=90;
+                        System.out.println("Existe un error en los caracteres, case 4 archivo 2");
+                        //estado=90;
                     }
                     break;
             }
