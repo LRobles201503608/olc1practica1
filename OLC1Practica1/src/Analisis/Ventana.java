@@ -8,7 +8,12 @@ package Analisis;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -24,11 +29,12 @@ public class Ventana extends javax.swing.JFrame {
 
     FileInputStream entrada;
     FileOutputStream salida;
-    
+    ArrayList<Tokens> tokens=new ArrayList<Tokens>();
+    ArrayList<String> Errores=new ArrayList<String>();
     ArrayList<Nivel> niveles=new ArrayList<Nivel>();
     ArrayList<Figuras> figuras=new ArrayList<Figuras>();
     
-    AnalisisLexico analisis=new AnalisisLexico(this.niveles,this.figuras);
+    AnalisisLexico analisis=new AnalisisLexico(this.niveles,this.figuras,this.Errores,this.tokens);
     /**
      * Creates new form Ventana
      */
@@ -59,6 +65,8 @@ public class Ventana extends javax.swing.JFrame {
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenuItem5 = new javax.swing.JMenuItem();
         jMenuItem7 = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        jMenuItem10 = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem8 = new javax.swing.JMenuItem();
         jMenuItem9 = new javax.swing.JMenuItem();
@@ -129,6 +137,18 @@ public class Ventana extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu2);
 
+        jMenu4.setText("Reportes");
+
+        jMenuItem10.setText("Reportes Tokens");
+        jMenuItem10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem10ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem10);
+
+        jMenuBar1.add(jMenu4);
+
         jMenu3.setText("Ayuda");
 
         jMenuItem8.setText("Manual de usuario");
@@ -150,21 +170,21 @@ public class Ventana extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 460, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 460, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 948, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 253, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 253, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(312, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 253, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 253, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(41, Short.MAX_VALUE))
         );
 
         pack();
@@ -238,6 +258,15 @@ public class Ventana extends javax.swing.JFrame {
         // TODO add your handling code here:
         analisis.AnalisisFiguras(jTextArea2.getText());
     }//GEN-LAST:event_jMenuItem5ActionPerformed
+
+    private void jMenuItem10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem10ActionPerformed
+        try {
+            // TODO add your handling code here:
+            EscribirReportes();
+        } catch (IOException ex) {
+            Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jMenuItem10ActionPerformed
 public String AbrirArchivo(File archivo){
             String documento = "";
             try {
@@ -257,6 +286,33 @@ public String AbrirArchivo(File archivo){
             return documento;
                 
         }
+public void EscribirReportes() throws IOException{
+            String texto = "";
+            texto += "<html>";
+            texto += "\n<head><title>Tokens</title></head>\n";
+            texto += "<body bgcolor=\"Aqua\"> \n <h1 align=\"center\">REPORTE DE TOKENS</h1> <table border=\"2\" align=\"center\">\n";
+            texto += "<tr><td>NO.</td><td>LINEA</td><td>COLUMNA</td><td>TOKEN</td><td>LEXEMA</td></tr>\n";
+            for (int i = 0; i < tokens.size(); i++)
+            {
+                texto += "<tr><td>";
+                texto += i+1;
+                texto += "</td><td>";
+                texto += tokens.get(i).linea;
+                texto += "</td><td>";
+                texto += tokens.get(i).columna;
+                texto += "</td><td>";
+                texto += tokens.get(i).token;
+                texto += "</td><td>";
+                texto += tokens.get(i).lexema;
+                texto += "</td></tr> \n";
+            }
+            texto += "</table>\n</body>\n</html>";
+            String fileName = "Tokens.html";
+            FileWriter archivo = new FileWriter(fileName);
+            PrintWriter escritura = new PrintWriter(archivo);
+            escritura.println(texto);
+            archivo.close();
+}
     /**
      * @param args the command line arguments
      */
@@ -296,8 +352,10 @@ public String AbrirArchivo(File archivo){
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
