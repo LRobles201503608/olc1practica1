@@ -77,6 +77,7 @@ public class AnalisisLexico {
 //**********************************case 2estado de nivel y traslado a dimensiones del tablero*********************************************
                 case 2:
                     tablero =new ArrayList<Character>();
+                    tableroaux=new ArrayList<Character>();
                     tablero.clear();
                     tableroaux.clear();
                     if(caracter==32||caracter==10||caracter==13){
@@ -229,7 +230,7 @@ public class AnalisisLexico {
                     }
                     break;
                 case 3:
-                    if (caracteractual=='\n'){
+                    if (cadena.charAt(i)=='\r'||cadena.charAt(i+1)=='\n'){
                         figuras.add(new Figuras(simbolo,posicion));
                         estado=4;
                     }else{
@@ -238,7 +239,9 @@ public class AnalisisLexico {
                     }
                     break;
                 case 4:
-                    if(caracter==73||caracter==74||caracter==76||caracter==79||caracter==83||caracter==84||caracter==90){
+                    if (caracter==13||caracter==10){
+                    
+                    }else if(caracter==73||caracter==74||caracter==76||caracter==79||caracter==83||caracter==84||caracter==90){
                         simbolo=String.valueOf(caracteractual);
                         estado=1;
                     }else{
@@ -248,5 +251,7 @@ public class AnalisisLexico {
                     break;
             }
         }
+        figuras.add(new Figuras(simbolo,posicion));
+        System.out.println("");
     }
 }

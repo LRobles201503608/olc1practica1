@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -18,6 +19,7 @@ import javax.swing.JOptionPane;
  */
 public class Ventana extends javax.swing.JFrame {
     JFileChooser seleccionar = new JFileChooser();
+    JFileChooser seleccionar2 = new JFileChooser();
     File archivo;
 
     FileInputStream entrada;
@@ -170,6 +172,8 @@ public class Ventana extends javax.swing.JFrame {
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         // TODO add your handling code here:
+        FileNameExtensionFilter FiltroArchivo1=new FileNameExtensionFilter("TRS","trs");
+        seleccionar.setFileFilter(FiltroArchivo1);
         if(seleccionar.showDialog(null, "Abrir")==JFileChooser.APPROVE_OPTION){
         archivo = seleccionar.getSelectedFile();
         
@@ -191,8 +195,10 @@ public class Ventana extends javax.swing.JFrame {
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         // TODO add your handling code here:
-           if(seleccionar.showDialog(null, "Abrir")==JFileChooser.APPROVE_OPTION){
-        archivo = seleccionar.getSelectedFile();
+        FileNameExtensionFilter FiltroArchivo2=new FileNameExtensionFilter("PZS","pzs");
+        seleccionar2.setFileFilter(FiltroArchivo2);
+        if(seleccionar2.showDialog(null, "Abrir")==JFileChooser.APPROVE_OPTION){
+        archivo = seleccionar2.getSelectedFile();
         
         if(archivo.canRead()){
             if(archivo.getName().endsWith("pzs")){
