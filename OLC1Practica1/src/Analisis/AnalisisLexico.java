@@ -24,6 +24,135 @@ public class AnalisisLexico {
         this.tokens=tokens;
         this.Errores=Errores;
     }
+    
+    public void AnalisisTableroNivelesV2(String cadena){
+        int linea = 1;
+        int columna = 1;
+        String cadconcat="";
+        int estado=0;
+        int caracter =0;
+        char caracteractual;
+        String simbolo="";
+        String posicion="";
+        for(int i=0;i<cadena.length();i++){
+            caracteractual=cadena.charAt(i);
+            caracter=(int)caracteractual;
+            switch(estado){
+                case 0:
+                    if(caracter == 60){
+                        cadconcat+=String.valueOf(caracteractual);
+                        estado = 1;
+                    }else if(caracter>47&&caracter<58){
+                        cadconcat+=String.valueOf(caracteractual);
+                        estado=7;
+                    }else if((caracter>64&&caracter<91)||(caracter>96&&caracter<123)){
+                        cadconcat+=String.valueOf(caracteractual);
+                        estado=10;
+                    }else if(caracter==47){
+                        cadconcat+=String.valueOf(caracteractual);
+                        estado=11;
+                    }else if(caracter==35||caracter==42){
+                        estado=0;
+                        tokens.add(new Tokens(linea,columna,"Token: "+caracteractual,String.valueOf(caracteractual)));
+                        tablero.add(caracteractual);
+                    }else if(caracter==32||caracter==10||caracter==13||caracter==9){
+                        
+                    }else{
+                        Errores.add("Caracter erroneo: "+caracteractual+" Linea: "+linea+" Columna: "+columna);
+                    }
+                    break;
+                case 1:
+                    if(caracter==33){
+                        cadconcat+=String.valueOf(caracteractual);
+                        estado=2;
+                    }else{
+                        Errores.add("Caracter erroneo: "+caracteractual+" Linea: "+linea+" Columna: "+columna);
+                    }
+                    break;
+                case 2:
+                    cadconcat+=String.valueOf(caracteractual);
+                    estado=3;
+                    break;
+                case 3:
+                    if(caracter==62){
+                        cadconcat+=String.valueOf(caracteractual);
+                        estado=0;
+                        tokens.add(new Tokens(linea,columna,"Comentario Multilinea",cadconcat));
+                        cadconcat="";
+                    }else{
+                        cadconcat+=String.valueOf(caracteractual);
+                        estado=3;
+                    }
+                    break;
+                case 7:
+                    if(caracter>47&&caracter<58){
+                        cadconcat+=String.valueOf(caracteractual);
+                        estado=7;
+                    }else if(caracter==45){
+                        tokens.add(new Tokens(linea,columna,"Token: "+caracteractual,String.valueOf(caracteractual)));
+                        estado = 8;
+                    }else if(caracter==32||caracter==9){
+                    
+                    }else{
+                        Errores.add("Caracter erroneo: "+caracteractual+" Linea: "+linea+" Columna: "+columna);
+                    }
+                    break;
+                case 8:
+                    if(caracter>47&&caracter<58){
+                        cadconcat+=String.valueOf(caracteractual);
+                        estado=9;
+                    }else if(caracter==32||caracter==9){
+                    
+                    }else{
+                        Errores.add("Caracter erroneo: "+caracteractual+" Linea: "+linea+" Columna: "+columna);
+                    }
+                    break;
+                case 9:
+                    if(caracter>47&&caracter<58){
+                        cadconcat+=String.valueOf(caracteractual);
+                        estado=9;
+                    }else if(caracter==32||caracter==9){
+                    
+                    }else{
+                        Errores.add("Caracter erroneo: "+caracteractual+" Linea: "+linea+" Columna: "+columna);
+                    }
+                    break;
+                case 10:
+                    if((caracter>64&&caracter<91)||(caracter>96&&caracter<123)){
+                        cadconcat+=String.valueOf(caracteractual);
+                        estado=10;
+                    }else if(caracter==95){
+                        cadconcat+=String.valueOf(caracteractual);
+                        estado=10;
+                    }else if(caracter>47&&caracter<58){
+                        cadconcat+=String.valueOf(caracteractual);
+                        estado=10;
+                    }else{
+                        Errores.add("Caracter erroneo: "+caracteractual+" Linea: "+linea+" Columna: "+columna);
+                    }
+                    break;
+                case 11:
+                    if(caracter==47){
+                        cadconcat+=String.valueOf(caracteractual);
+                        estado=12;
+                    }else{
+                        Errores.add("Caracter erroneo: "+caracteractual+" Linea: "+linea+" Columna: "+columna);
+                    }
+                    break;
+                case 12:
+                    cadconcat+=String.valueOf(caracteractual);
+                    estado=13;
+                    break;
+                case 13:
+                    if(caracter==10||caracter==13){
+                        tokens.add(new Tokens(linea,columna,"Comentario Unilinea",cadconcat));
+                    }else{
+                        cadconcat+=String.valueOf(caracteractual);
+                        estado=13;
+                    }
+            }
+        }
+    }
     public void AnalisisTableroNiveles(String cadena){
         int linea = 1;
         int columna = 0;
@@ -36,7 +165,7 @@ public class AnalisisLexico {
         int P=0;
         String id="";
         ArrayList<Character> tableroaux =new ArrayList<Character>();
-        int contadorsalto=0, contadormayor=0, contadorexclamacion=0;
+        int contadorsalto=0, contadormayor=0, contadorexclamacion=0,contadorbarra=0;
         for (int i = 0; i<cadena.length() ; i++){
             caracteractual=cadena.charAt(i);
             caracter=(int)caracteractual;
@@ -58,7 +187,11 @@ public class AnalisisLexico {
                 case 1:
                     if(caracter == 33 || caracter == 47){
                         estado=1;
-                        contadorexclamacion++;
+                        if(caracter==33){
+                            contadorexclamacion++;    
+                        }else{
+                            contadorbarra++;
+                        }
                     }else if(caracter == 62){
                         contadormayor++;
                     }else if(caracteractual=='\n'){
@@ -66,7 +199,7 @@ public class AnalisisLexico {
                         linea++;
                         columna=0;
                     }else if(caracter>=47 && caracter <=58){
-                        if(contadorsalto==1 || (contadormayor==1&&contadorexclamacion==2)){
+                        if((contadorsalto==1&&contadorbarra>=1)|| (contadormayor==1&&contadorexclamacion==2)){
                           if(caracter>=50 && caracter<=58){
                                 cadconcat += String.valueOf(caracteractual);
                                 estado=2;
@@ -76,6 +209,7 @@ public class AnalisisLexico {
                                 tokens.add(new Tokens(linea,columna,"Comentario Multilinea","Comentario Omitido"));
                             }  
                         }else{
+                            cadconcat+=String.valueOf(caracteractual);
                             estado = 1;
                         }
                     }
@@ -99,9 +233,9 @@ public class AnalisisLexico {
                             estado=2;
                         }
                     }else{
-                        if(cadena.charAt(i+1)=='\n'){
+                        if(cadena.charAt(i+1)=='\n'||cadena.charAt(i)=='\n'){
                             if(cadena.charAt(i)!='\r'){
-                                cadconcat += String.valueOf(caracteractual);
+                                //cadconcat += String.valueOf(caracteractual);
                                 linea++;
                                 columna=0;
                                 estado=2;   
@@ -123,6 +257,8 @@ public class AnalisisLexico {
                                 tokens.add(new Tokens(linea,columna,"Numero",String.valueOf(N)));
                                 estado=3;
                             }
+                        }else if(caracter>=47 && caracter <=58){
+                            cadconcat += String.valueOf(caracteractual);
                         }
                     }
                     break;
@@ -147,7 +283,7 @@ public class AnalisisLexico {
                     if(caracter>=47 && caracter <=58){
                             cadconcat += String.valueOf(caracteractual);
                             estado=4;
-                    }else if(caracter==32){
+                    }else if(caracter==32||caracter==10||caracter==13){
                         P=Integer.parseInt(cadconcat);
                         tokens.add(new Tokens(linea,columna,"Numero",String.valueOf(P)));
                         estado=5;
@@ -203,6 +339,7 @@ public class AnalisisLexico {
                     }else if(caracter==32||caracter==10||caracter==13){
                         
                     }else{
+                        Errores.add("Caracter erroneo: "+caracteractual+" Linea: "+linea+" Columna: "+columna);
                         System.out.println("Existe un error en los caracteres, case 6 archivo 1");
                     }
                     break;
@@ -234,6 +371,7 @@ public class AnalisisLexico {
                         tokens.add(new Tokens(linea,columna,"Pieza Tetris",String.valueOf(simbolo)));
                         estado=1;
                     }else{
+                        Errores.add("Caracter erroneo: en archivo 2"+caracteractual+" Linea: "+linea+" Columna: "+columna);
                         System.out.println("Existe un error en los caracteres, case 0 archivo 2");
                         //estado=90;
                     }
@@ -245,6 +383,7 @@ public class AnalisisLexico {
                         tokens.add(new Tokens(linea,columna,"Coma",","));
                         estado=2;
                     }else{
+                        Errores.add("Caracter erroneo en archivo 2: "+caracteractual+" Linea: "+linea+" Columna: "+columna);
                         System.out.println("Existe un error en los caracteres, case 1 archivo 2");
                         //estado=90;
                     }
@@ -263,6 +402,7 @@ public class AnalisisLexico {
                         figuras.add(new Figuras(simbolo,posicion));
                         estado=4;
                     }else{
+                        Errores.add("Caracter erroneo en archivo 2: "+caracteractual+" Linea: "+linea+" Columna: "+columna);
                         System.out.println("Existe un error en los caracteres, case 3 archivo 2");
                         //estado=90;
                     }
@@ -275,7 +415,7 @@ public class AnalisisLexico {
                         tokens.add(new Tokens(linea,columna,"Pieza Tetris",String.valueOf(simbolo)));
                         estado=1;
                     }else{
-                        Errores.add("Caracter erroneo: "+caracteractual+" Linea: "+linea+" Columna: "+columna);
+                        Errores.add("Caracter erroneo en archivo 2: "+caracteractual+" Linea: "+linea+" Columna: "+columna);
                         System.out.println("Existe un error en los caracteres, case 4 archivo 2");
                         //estado=90;
                     }
