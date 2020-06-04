@@ -251,7 +251,7 @@ public class Ventana extends javax.swing.JFrame {
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
         // TODO add your handling code here:
-        analisis.AnalisisTableroNiveles(jTextArea1.getText());
+        analisis.AnalisisTableroNivelesV2(jTextArea1.getText());
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 
     private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
@@ -307,11 +307,34 @@ public void EscribirReportes() throws IOException{
                 texto += "</td></tr> \n";
             }
             texto += "</table>\n</body>\n</html>";
-            String fileName = "Tokens.html";
+            String fileName = "Tokens2.html";
             FileWriter archivo = new FileWriter(fileName);
             PrintWriter escritura = new PrintWriter(archivo);
             escritura.println(texto);
             archivo.close();
+            
+            
+            String texto2 = "";
+            texto2 += "<html>";
+            texto2 += "\n<head><title>Errores</title></head>\n";
+            texto2 += "<body bgcolor=\"Aqua\"> \n <h1 align=\"center\">REPORTE DE ERRORES</h1> <table border=\"2\" align=\"center\">\n";
+            texto2 += "<tr><td>NO.</td><td>ERROR</td></tr>\n";
+            for (int i = 0; i < Errores.size(); i++)
+            {
+                texto2 += "<tr><td>";
+                texto2 += i+1;
+                texto2 += "</td><td>";
+                texto2 += Errores.get(i);
+                texto2 += "</td></tr> \n";
+            }
+            texto2 += "</table>\n</body>\n</html>";
+            String fileName2 = "Errores.html";
+            FileWriter archivo2 = new FileWriter(fileName2);
+            PrintWriter escritura2 = new PrintWriter(archivo2);
+            escritura2.println(texto2);
+            archivo2.close();
+            
+            
 }
     /**
      * @param args the command line arguments
