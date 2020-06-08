@@ -133,6 +133,11 @@ public class Ventana extends javax.swing.JFrame {
         jMenu2.add(jMenuItem5);
 
         jMenuItem7.setText("Jugar");
+        jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem7ActionPerformed(evt);
+            }
+        });
         jMenu2.add(jMenuItem7);
 
         jMenuBar1.add(jMenu2);
@@ -267,6 +272,12 @@ public class Ventana extends javax.swing.JFrame {
             Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jMenuItem10ActionPerformed
+
+    private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
+        // TODO add your handling code here:
+        JuegoTetris juego= new JuegoTetris(niveles);
+        juego.iniciar();
+    }//GEN-LAST:event_jMenuItem7ActionPerformed
 public String AbrirArchivo(File archivo){
             String documento = "";
             try {

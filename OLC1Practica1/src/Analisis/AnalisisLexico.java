@@ -18,6 +18,7 @@ public class AnalisisLexico {
     ArrayList<Figuras> figuras=new ArrayList<Figuras>();
     ArrayList<Tokens> tokens=new ArrayList<Tokens>();
     ArrayList<String> Errores=new ArrayList<String>();
+    char [][] tab;
     public AnalisisLexico(ArrayList<Nivel>niveles, ArrayList<Figuras>figuras,ArrayList<String> Errores,ArrayList<Tokens> tokens) {
         this.niveles=niveles;
         this.figuras=figuras;
@@ -62,7 +63,9 @@ public class AnalisisLexico {
                     }
                         if(this.tablero.size()!=0){
                             tableroaux=tablero;
-                            niveles.add(new Nivel(nivel,N,P,id,tableroaux));
+                            tab=new char[N][P];
+                            Llenado(tableroaux,N,P);
+                            niveles.add(new Nivel(nivel,N,P,id,tab,tableroaux));
                             id="";
                             N=0;
                             P=0;
@@ -243,7 +246,9 @@ public class AnalisisLexico {
             }
         }
         tableroaux=tablero;
-        niveles.add(new Nivel(nivel,N,P,id,tableroaux));
+        tab=new char[N][P];
+        Llenado(tableroaux,N,P);
+        niveles.add(new Nivel(nivel,N,P,id,tab,tableroaux));
         id="";
         N=0;
         P=0;
@@ -523,5 +528,18 @@ public class AnalisisLexico {
         }
         figuras.add(new Figuras(simbolo,posicion));
         System.out.println("");
+    }
+
+    private void Llenado(ArrayList<Character>tableroaux,int X ,int Y) {
+        int posarreglo=0;
+        for(int i=0;i<X;i++){
+            for(int j =0;j<Y;j++){
+                if(posarreglo<tableroaux.size()){
+                    tab[i][j]=tableroaux.get(posarreglo);
+                    posarreglo++;
+                }
+                
+            }
+        }
     }
 }
