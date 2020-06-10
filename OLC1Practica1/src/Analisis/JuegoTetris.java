@@ -19,6 +19,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -28,6 +29,9 @@ public class JuegoTetris extends JPanel{
     int contadorrepro=0;    
     private ArrayList<String>pi=new ArrayList();
     int dimensionx=0,dimensiony=0;
+    int noNivel=0;
+    int [] puntosWin={100,300,700,1500,3100,6300,12700,25500,51100};
+    int [] velocidades={1200,1100,1000,950,850,750,650,550,500};
     private final Point[][][] mypoint={
         {
             //I
@@ -81,28 +85,35 @@ public class JuegoTetris extends JPanel{
     };
     
     private final Color [] color={Color.CYAN,Color.BLUE,Color.MAGENTA,Color.GREEN,Color.RED,Color.WHITE,Color.PINK,Color.BLACK,Color.ORANGE};
-
+    ArrayList<Figuras> figuras=new ArrayList<Figuras>();
     private Point pt;
     private int currentPiece,rotation;
     private ArrayList<Integer> siguientePieza=new ArrayList<>();
+    private ArrayList<Integer> siguientePieza2=new ArrayList<>();
+    private ArrayList<Integer> siguientePosicion=new ArrayList<>();
     private long score;
     private Color[][] well; // es el fondo
     ArrayList<Nivel>niveles;
+    int posiactual=0;
     
-    public JuegoTetris(ArrayList<Nivel>niveles) {
+    
+    public JuegoTetris(ArrayList<Nivel>niveles,int nonivel, ArrayList<Figuras> figuras) {
         this.niveles=niveles;
+        noNivel=nonivel;
+        this.figuras=figuras;
     }
     public void iniciar(){
         JFrame f= new JFrame();
-        f.setTitle(niveles.get(0).getId());
+        f.setTitle(niveles.get(noNivel).getId());
         f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         f.setSize(12*26+10, 26*23+25); // variar el 12 y 26 de las dimenciones x y con los valores que me den en el archivo de entrada
         f.setVisible(true);
         f.setResizable(false);
 
-        init();
+        initvPrueba();
         f.add(this);
-        
+        int puntoswin=puntosWin[noNivel];
+        int velocidades=this.velocidades[noNivel];
         f.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -138,15 +149,23 @@ public class JuegoTetris extends JPanel{
         
         new Thread(){
             public void run(){
-                while(true){
+                while(score<=puntoswin){
                     try {
-                        Thread.sleep(1000); // con esto se maneja la velocidad del nivel
+                        System.out.println("Score:"+score+"puntoswin"+puntoswin);
+                        Thread.sleep(velocidades); // con esto se maneja la velocidad del nivel
                         
                     } catch (InterruptedException ex) {
                         
                     }
                     drop();
                 }
+                JOptionPane.showMessageDialog(null,"Felicidades usted completó el nivel: "+(niveles.get(noNivel).id)+" Con un puntaje de: "+score);
+                    noNivel++;
+                    if(noNivel<niveles.size()){
+                        f.dispose();
+                        JuegoTetris ju=new JuegoTetris(niveles,noNivel,figuras);
+                        ju.iniciar();
+                    }
             }
         }.start();
     }
@@ -161,31 +180,188 @@ public class JuegoTetris extends JPanel{
             }
         }
     }
-    pi.add("J");
-    pi.add("L");
-    NuevaPieza();
+    NuevaPiezav2();
 }
-
-private void NuevaPieza(){
-    pt=new Point(5,1);
-    rotation=0;
-    if(siguientePieza.isEmpty()){
-        Collections.addAll(siguientePieza, 0,1,2,3,4,5);
-        Collections.shuffle(siguientePieza);
-    }else{
-        if(currentPiece>siguientePieza.size()){
-            currentPiece=0;
-        }else{
-            
+    private void init2(){
+        char [][] tab=niveles.get(noNivel).tab;
+        well= new Color[niveles.get(noNivel).filas+2][niveles.get(noNivel).columnas+2];
+        for(int i=0;i<niveles.get(noNivel).columnas+2;i++){
+            for(int j=0;j<niveles.get(noNivel).filas+2;j++){
+                if(i==0||i==niveles.get(noNivel).columnas+1||j==niveles.get(noNivel).filas){
+                    well[i][j]=Color.green;
+                }else{
+                    well[i][j]=Color.BLACK;
+                }
+            }
+        }
+        NuevaPiezav2();
+    }
+private void initvPrueba(){
+    char [][] tab=niveles.get(noNivel).tab;
+    well= new Color[12][24]; // el 12 y 24 son las dimensiones del juego -2
+    for(int i=0;i<12;i++){
+        for(int j=0;j<23;j++){
+            if(i==11||j==22){
+                well[i][j]=Color.PINK;
+            }else{
+                if(j<niveles.get(noNivel).filas &&i<niveles.get(noNivel).columnas){
+                    if(tab[j][i]=='#'){
+                    well[i][j]=Color.BLACK;
+                    }else{
+                        well[i][j]=Color.YELLOW;
+                    }
+                }
+            }
         }
     }
+    NuevaPiezav2();
 }
 private void NuevaPiezav2(){
     pt=new Point(5,-1);
-    rotation=0;
+    rotation=0;    
     if(siguientePieza.isEmpty()){
-        Collections.addAll(siguientePieza, 0,1,2,3);
-        Collections.shuffle(siguientePieza);
+        posiactual=0;
+        for(int i=0;i<figuras.size();i++){
+            if(figuras.get(i).getFigura().equalsIgnoreCase("I")){
+                if(figuras.get(i).getPosicion().equalsIgnoreCase("<")){
+                    rotation=0;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(0);
+                }else if(figuras.get(i).getPosicion().equalsIgnoreCase("^")){
+                    rotation=1;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(0);
+                }else if(figuras.get(i).getPosicion().equalsIgnoreCase(">")){
+                    rotation=2;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(0);
+                }else if(figuras.get(i).getPosicion().equalsIgnoreCase("v")){
+                    rotation=3;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(0);
+                } 
+            }else if(figuras.get(i).getFigura().equalsIgnoreCase("L")){
+                if(figuras.get(i).getPosicion().equalsIgnoreCase("<")){
+                    rotation=0;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(1);
+                }else if(figuras.get(i).getPosicion().equalsIgnoreCase("^")){
+                    rotation=1;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(1);
+                }else if(figuras.get(i).getPosicion().equalsIgnoreCase(">")){
+                    rotation=2;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(1);
+                }else if(figuras.get(i).getPosicion().equalsIgnoreCase("v")){
+                    rotation=3;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(1);
+                } 
+            }else if(figuras.get(i).getFigura().equalsIgnoreCase("J")){
+                if(figuras.get(i).getPosicion().equalsIgnoreCase("<")){
+                    rotation=0;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(2);
+                }else if(figuras.get(i).getPosicion().equalsIgnoreCase("^")){
+                    rotation=1;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(2);
+                }else if(figuras.get(i).getPosicion().equalsIgnoreCase(">")){
+                    rotation=2;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(2);
+                }else if(figuras.get(i).getPosicion().equalsIgnoreCase("v")){
+                    rotation=3;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(2);
+                } 
+            }else if(figuras.get(i).getFigura().equalsIgnoreCase("O")){
+                if(figuras.get(i).getPosicion().equalsIgnoreCase("<")){
+                    rotation=0;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(3);
+                }else if(figuras.get(i).getPosicion().equalsIgnoreCase("^")){
+                    rotation=1;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(3);
+                }else if(figuras.get(i).getPosicion().equalsIgnoreCase(">")){
+                    rotation=2;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(3);
+                }else if(figuras.get(i).getPosicion().equalsIgnoreCase("v")){
+                    rotation=3;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(3);
+                } 
+            }else if(figuras.get(i).getFigura().equalsIgnoreCase("S")){
+                if(figuras.get(i).getPosicion().equalsIgnoreCase("<")){
+                    rotation=1;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(4);
+                }else if(figuras.get(i).getPosicion().equalsIgnoreCase("^")){
+                    rotation=0;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(4);
+                }else if(figuras.get(i).getPosicion().equalsIgnoreCase(">")){
+                    rotation=3;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(4);
+                }else if(figuras.get(i).getPosicion().equalsIgnoreCase("v")){
+                    rotation=2;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(4);
+                } 
+            }else if(figuras.get(i).getFigura().equalsIgnoreCase("Z")){
+                if(figuras.get(i).getPosicion().equalsIgnoreCase("<")){
+                    rotation=1;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(5);
+                }else if(figuras.get(i).getPosicion().equalsIgnoreCase("^")){
+                    rotation=0;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(5);
+                }else if(figuras.get(i).getPosicion().equalsIgnoreCase(">")){
+                    rotation=3;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(5);
+                }else if(figuras.get(i).getPosicion().equalsIgnoreCase("v")){
+                    rotation=2;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(5);
+                } 
+            }else if(figuras.get(i).getFigura().equalsIgnoreCase("T")){
+                if(figuras.get(i).getPosicion().equalsIgnoreCase("<")){
+                    rotation=1;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(6);
+                }else if(figuras.get(i).getPosicion().equalsIgnoreCase("^")){
+                    rotation=0;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(6);
+                }else if(figuras.get(i).getPosicion().equalsIgnoreCase(">")){
+                    rotation=3;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(6);
+                }else if(figuras.get(i).getPosicion().equalsIgnoreCase("v")){
+                    rotation=2;
+                    siguientePosicion.add(rotation);
+                    siguientePieza.add(6);
+                } 
+            }
+        }
+        currentPiece=siguientePieza.get(0);
+        rotation=siguientePosicion.get(0);
+        
+    }else {
+        if(posiactual>=siguientePieza.size()){
+            currentPiece=siguientePieza.get(0);
+            rotation=siguientePosicion.get(0);
+            posiactual=0;
+        }else{
+            rotation=siguientePosicion.get(posiactual);
+            currentPiece=siguientePieza.get(posiactual);
+        }
     }
 }
 
@@ -229,8 +405,8 @@ public void fixToWell(){
         well[pt.x+p.x][pt.y+p.y]=color[currentPiece];
     }
     clearRow();
-    currentPiece++;
-    NuevaPieza();
+    posiactual++;
+    NuevaPiezav2();
 }
 
 
@@ -261,19 +437,8 @@ public void clearRow(){
         }
     }
     System.out.println(numClear);
-    switch(numClear){ //son las condiciones para poner el punteo, el numClear es la cantidad de filas que limpio
-        case 22:
-             score+=100;
-             break;
-        case 20:
-            score+=200;
-            break;
-        case 23:
-            score+=300;
-            break;
-        case 21:
-            score+=400;
-            break;
+    if(numClear>0){
+        score+=(10*(noNivel+1));
     }
     
 }

@@ -5,6 +5,7 @@
  */
 package Analisis;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -157,6 +158,11 @@ public class Ventana extends javax.swing.JFrame {
         jMenu3.setText("Ayuda");
 
         jMenuItem8.setText("Manual de usuario");
+        jMenuItem8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem8ActionPerformed(evt);
+            }
+        });
         jMenu3.add(jMenuItem8);
 
         jMenuItem9.setText("Acerca de...");
@@ -275,9 +281,22 @@ public class Ventana extends javax.swing.JFrame {
 
     private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
         // TODO add your handling code here:
-        JuegoTetris juego= new JuegoTetris(niveles);
+        JuegoTetris juego= new JuegoTetris(niveles,0,figuras);
         juego.iniciar();
     }//GEN-LAST:event_jMenuItem7ActionPerformed
+
+    private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
+        // TODO add your handling code here:
+        Desktop d = Desktop.getDesktop();
+        File file = new File("").getAbsoluteFile();
+        String rutt = file+"\\src\\Analisis\\Manual de Usuario.pdf";
+        file = new File(rutt);
+        try {
+            d.open(file);
+        } catch (IOException ex) {
+            Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jMenuItem8ActionPerformed
 public String AbrirArchivo(File archivo){
             String documento = "";
             try {
